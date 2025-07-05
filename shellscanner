@@ -1,0 +1,170 @@
+<?php
+session_start();
+
+$patterns = [
+    'PHP_Backdoor_Shell' => [
+        '/eval\s*\(/i',
+        '/base64_decode\s*\(/i',
+        '/gzinflate\s*\(/i',
+        '/shell_exec\s*\(/i',
+        '/exec\s*\(/i',
+        '/passthru\s*\(/i',
+        '/system\s*\(/i',
+        '/assert\s*\(/i',
+        '/preg_replace\s*\(.*\/e.*\)/i',
+        '/popen\s*\(/i',
+        '/proc_open\s*\(/i'
+    ],
+    'PHP_Obfuscation' => [
+        '/str_rot13\s*\(/i',
+        '/gzdeflate\s*\(/i',
+        '/0x[0-9a-fA-F]+/i',
+        '/.{1000,}/s'
+    ],
+    'PHP_EncodedPayload' => [
+        '/[A-Za-z0-9+\/]{100,}={0,2}/',
+        '/(base64_decode|gzuncompress|gzinflate|str_rot13)\s*\(/i'
+    ]
+];
+
+$scan_dir = '';
+$matches = [];
+
+// Handle deletion
+if (isset($_GET['delete']) && isset($_GET['file'])) {
+    $target = $_GET['file'];
+    if (file_exists($target)) {
+        unlink($target);
+        echo "<p style='color:lime;'>✅ Deleted: " . htmlspecialchars($target) . "</p>";
+    }
+}
+
+// Handle scan
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['scan_dir'])) {
+    $input_dir = trim($_POST['scan_dir']);
+    $real_dir = realpath($input_dir);
+
+    if ($real_dir && is_dir($real_dir)) {
+        $_SESSION['scan_dir'] = $scan_dir = $real_dir;
+        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($scan_dir));
+
+        foreach ($iterator as $file) {
+            if ($file->isFile() && preg_match('/\.(php|phtml|inc)$/i', $file->getFilename())) {
+                $lines = file($file->getPathname());
+                $hit_rules = [];
+                $dangerous_lines = [];
+
+                foreach ($lines as $i => $line) {
+                    foreach ($patterns as $rule_name => $regexes) {
+                        foreach ($regexes as $pattern) {
+                            if (preg_match($pattern, $line)) {
+                                $hit_rules[] = $rule_name;
+                                $dangerous_lines[] = ($i + 1) . ": " . rtrim($line);
+                                break 2;
+                            }
+                        }
+                    }
+                }
+
+                if (!empty($hit_rules)) {
+                    $matches[$file->getPathname()] = [
+                        'rules' => array_unique($hit_rules),
+                        'lines' => $dangerous_lines
+                    ];
+                }
+            }
+        }
+    } else {
+        $error = "❌ Invalid directory: " . htmlspecialchars($input_dir);
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>PHP Backdoor Scanner</title>
+    <style>
+        body {
+            background: #000;
+            color: #00ff00;
+            font-family: monospace;
+            padding: 20px;
+        }
+        input[type="text"], input[type="submit"] {
+            background: #111;
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 6px;
+            border-radius: 4px;
+        }
+        input[type="text"] { width: 400px; }
+        .file-container {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        .file-path {
+            width: 40%;
+            color: #00ff00;
+        }
+        .file-preview {
+            width: 60%;
+            background: #111;
+            padding: 10px;
+            border: 1px solid #00ff00;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .rule-header {
+            font-weight: bold;
+            color: red;
+            margin-bottom: 5px;
+        }
+        .delete-btn {
+            margin-top: 10px;
+            display: inline-block;
+            background: red;
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            text-decoration: none;
+        }
+        .delete-btn:hover {
+            background: darkred;
+        }
+    </style>
+</head>
+<body>
+
+<h2>🛡️ PHP Backdoor & Obfuscation Scanner</h2>
+
+<form method="POST">
+    <label><strong>Enter directory to scan:</strong></label><br>
+    <input type="text" name="scan_dir" value="<?= htmlspecialchars($scan_dir) ?>" required />
+    <input type="submit" value="Scan">
+</form>
+
+<?php if (isset($error)): ?>
+    <p style="color:red;"><?= $error ?></p>
+<?php elseif (!empty($matches)): ?>
+    <h3>⚠️ Suspicious Files Found:</h3>
+    <?php foreach ($matches as $file => $info): ?>
+        <div class="file-container">
+            <div class="file-path">
+                <div class="rule-header">[<?= implode(', ', $info['rules']) ?>]</div>
+                <?= htmlspecialchars($file) ?><br>
+                <a class="delete-btn" href="?delete=1&file=<?= urlencode($file) ?>" onclick="return confirm('Delete this file?')">🗑️ Delete</a>
+            </div>
+            <div class="file-preview"><?= htmlspecialchars(implode("\n", $info['lines'])) ?></div>
+        </div>
+    <?php endforeach; ?>
+<?php elseif (!empty($scan_dir)): ?>
+    <p>✅ No suspicious files found in <?= htmlspecialchars($scan_dir) ?>.</p>
+<?php endif; ?>
+
+</body>
+</html>
