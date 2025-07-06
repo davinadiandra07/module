@@ -1,5 +1,4 @@
 <?php
-<?php
 function isGooglebotIP($ip) {
     $hostname = gethostbyaddr($ip);
     return (
