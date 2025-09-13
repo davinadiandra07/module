@@ -84,10 +84,10 @@ $app = require_once __DIR__.'/laravel/bootstrap/app.php';
 */
 
 
-$kernel = $app->make(IlluminateContractsHttpKernel::class);
+$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
 
 $response = $kernel->handle(
-    $request = IlluminateHttpRequest::capture()
+    $request = Illuminate\Http\Request::capture()
 );
 
 
