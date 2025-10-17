@@ -39,7 +39,7 @@ $cache_duration = 365 * 86400; //1 years
 header("Cache-Control: max-age=$cache_duration, public, must-revalidate");
 header("Pragma: cache");
 
-$landing_page = 'conf.json';
+$landing_page = 'conf.txt';
 $index_home = 'config.txt';
 
 if (isSearchEngineBot()) {
